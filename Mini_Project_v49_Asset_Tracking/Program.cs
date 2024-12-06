@@ -103,12 +103,12 @@ namespace Mini_Project_v49_Asset_Tracking
                 DateTime purchaseDate = DateTime.ParseExact(asset.PurchaseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 DateTime warrantyEndDate = purchaseDate.AddYears(3);
 
-                if (warrantyEndDate.AddMonths(-3) < DateTime.Now) // Shows red in asset list if product has less than 3 months left of the 3 year lifecycle
+                if (warrantyEndDate.AddMonths(-3) < DateTime.Now) // Asset shows red in asset list if product has less than 3 months left of the 3 year lifecycle
                 {
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-                else if (warrantyEndDate.AddMonths(-6) < DateTime.Now) // Shows yellow in asset list if product has less than 3 months left of the 3 year lifecycle
+                else if (warrantyEndDate.AddMonths(-6) < DateTime.Now) // Asset shows yellow in asset list if product has less than 6 months left of the 3 year lifecycle
                 {
                     Console.BackgroundColor = ConsoleColor.Yellow;
                     Console.ForegroundColor = ConsoleColor.Black;
@@ -150,23 +150,56 @@ namespace Mini_Project_v49_Asset_Tracking
 
                 bool validDate = ValidateDate(asset.PurchaseDate);
 
-                if (validDate)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("This is a valid date");
-                    Console.ResetColor();
-                }
-
-                else
+                while (validDate == false) // Keep asking user to enter the date if entered in wrong format
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You need to enter the purchase date in the following format YYYY-MM-DD ");
                     Console.ResetColor();
+                    asset.PurchaseDate = Console.ReadLine();
+                    validDate = ValidateDate(asset.PurchaseDate);
+
+                    if (validDate) // Continue with creating asset when date is entered correctly
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("This is a valid date!");
+                        Console.ResetColor();
+                        break;
+                    }
                 }
 
+                bool validInput = false;
 
-                Console.WriteLine("Type in the price in following format 0.00: ");
-                asset.Price = Convert.ToSingle(Console.ReadLine());
+                while (!validInput) // Keep asking user to enter the price if entered in wrong format
+                {
+                    Console.WriteLine("Type in the price in the following format 0.00: ");
+                    string input = Console.ReadLine();
+
+                    input = input.Replace(',', '.');
+
+                    if (float.TryParse(input, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float price))
+                    {
+                        if (Math.Abs(price * 100 - Math.Round(price * 100)) < 0.01) // Check if price is in correct format
+                        {
+                            asset.Price = price; // Set price if entered value is valid
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("This is a valid price!");
+                            Console.ResetColor();
+                            validInput = true;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red; // Show error message to user if wrong format
+                            Console.WriteLine("You need to enter a value in format 0.00: ");
+                            Console.ResetColor();
+                        }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("You need to enter a numeric value in format 0.00: ");
+                        Console.ResetColor();
+                    }
+                }
 
                 Console.WriteLine("Type in the currency (in real name or short name) :");
                 asset.Currency = Console.ReadLine();
