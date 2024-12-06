@@ -31,8 +31,30 @@ namespace Mini_Project_v49_Asset_Tracking
 
         public static void ShowAssetList()
         {
-            Console.WriteLine("Office\t\tCategory\t\tBrand\t\tModel\t\tConfiguration\t\tPurchaseDate\t\tPrice\t\tCurrency"); // Column names
-            Console.WriteLine("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            // Using dynamic column width since length of input can differ too much between assets
+            int officeWidth = Program.AssetList.Max(a => a.Office.Length) + 2;  // Add 2 for space
+            int categoryWidth = Program.AssetList.Max(a => a.Category.Length) + 2;
+            int brandWidth = Program.AssetList.Max(a => a.Brand.Length) + 2;
+            int modelWidth = Program.AssetList.Max(a => a.Model.Length) + 2;
+            int configWidth = Program.AssetList.Max(a => a.Configuration.Length) + 2;
+            int dateWidth = 20; // Setting a fixed width for purchase date since the header name is longer than the actual date
+            int priceWidth = 12; // Setting a fixed width for price since it should be almost always the same length
+            int currencyWidth = Program.AssetList.Max(a => a.Currency.Length) + 2;
+
+            // Using dynamic width for column header also
+            Console.WriteLine(
+                $"{"Office".PadRight(officeWidth)}" +
+                $"{"Category".PadRight(categoryWidth)}" +
+                $"{"Brand".PadRight(brandWidth)}" +
+                $"{"Model".PadRight(modelWidth)}" +
+                $"{"Configuration".PadRight(configWidth)}" +
+                $"{"PurchaseDate".PadRight(dateWidth)}" +
+                $"{"Price".PadRight(priceWidth)}" +
+                $"{"Currency".PadRight(currencyWidth)}");
+
+            // Print line to separate header from list data
+            Console.WriteLine(new string('-', officeWidth + categoryWidth + brandWidth + modelWidth + configWidth + dateWidth + priceWidth + currencyWidth));
+
             foreach (Asset asset in Program.AssetList.OrderBy(x => x.Office).ThenBy(x => DateTime.ParseExact(x.PurchaseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)))
             {
                 DateTime purchaseDate = DateTime.ParseExact(asset.PurchaseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -47,16 +69,20 @@ namespace Mini_Project_v49_Asset_Tracking
                 {
                     Console.BackgroundColor = ConsoleColor.Yellow;
                     Console.ForegroundColor = ConsoleColor.Black;
-                };
-                Console.Write(asset.Office + "\t\t");
-                Console.Write(asset.Category + "\t\t");
-                Console.Write(asset.Brand + "\t\t");
-                Console.Write(asset.Model + "\t\t");
-                Console.Write(asset.Configuration + "\t\t");
-                Console.Write(asset.PurchaseDate + "\t\t");
-                Console.Write(asset.Price + "\t\t");
-                Console.Write(asset.Currency + "\t\t\n");
+                }
+
+                // Print the asset data from the list using dynamic width
+                Console.WriteLine(
+                $"{asset.Office.PadRight(officeWidth)}" +
+                $"{asset.Category.PadRight(categoryWidth)}" +
+                $"{asset.Brand.PadRight(brandWidth)}" +
+                $"{asset.Model.PadRight(modelWidth)}" +
+                $"{asset.Configuration.PadRight(configWidth)}" +
+                $"{asset.PurchaseDate.PadRight(dateWidth)}" +
+                $"{asset.Price.ToString("F2").PadRight(priceWidth)}" +
+                $"{asset.Currency.PadRight(currencyWidth)}");
                 Console.ResetColor();
+                
             }
             Console.WriteLine("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         }
